@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+    </style>
+</head>
+
+<body>
+    <canvas id="game" width="400px" height="400px"></canvas>
+</body>
+<script>
+    const FIELD_SIZE = 40;
+    const POINT_SIZE = 20;
+    const BORDER_SIZE = 1;
+
+    const canvas = document.querySelector('#game');
+    const context = canvas.getContext('2d');
+
+
+    class FieldData {
+        constructor(filedSize) {
+            this.fieldData = new Array(FIELD_SIZE).fill(false).map(el => new Array(FIELD_SIZE).fill(false));
+        }
+
+        getFiledSize() {
+            return this.fieldData.length;
+        }
+
+        onDataChange(func) {
+            this.dataChangeFunc = func;
+            this.dataChangeFunc(this.fieldData);
+        }
+
+        setData(y, x, state) {
+            this.fieldData[x][y] = state;
+            this.dataChangeFunc(this.fieldData);
+        }
+
+        setAllData(arr) {
+            this.fieldData = arr;
+            this.dataChangeFunc(this.fieldData);
+        }
+
+        getData(x, y) {
+            if (x < 0) {
+                x = FIELD_SIZE - 1 + x;
+            }
+            if (y < 0) {
+                y = FIELD_SIZE - 1 + y;
+            }
+            if (x >= FIELD_SIZE) {
+                x = x - FIELD_SIZE;
+            }
+            if (y >= FIELD_SIZE) {
+                y = y - FIELD_SIZE;
+            }
+            return this.fieldData[y][x];
+        }
+
+        neighborsHave(x, y) {
+            let neighborsHave = 0;
+            if (this.getData(x - 1, y)) neighborsHave++;
+            if (this.getData(x + 1, y)) neighborsHave++;
+            if (this.getData(x - 1, y - 1)) neighborsHave++;
+            if (this.getData(x, y - 1)) neighborsHave++;
+            if (this.getData(x + 1, y - 1)) neighborsHave++;
+            if (this.getData(x - 1, y + 1)) neighborsHave++;
+            if (this.getData(x, y + 1)) neighborsHave++;
+            if (this.getData(x + 1, y + 1)) neighborsHave++;
+            return neighborsHave;
+        }
+    }
+
+
+
+    const gameData = new FieldData(5);
+    gameData.onDataChange((data) => {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        for (let y = 0; y < FIELD_SIZE; y++) {
+            for (let x = 0; x < FIELD_SIZE; x++) {
+                if (data[y][x]) {
+                    context.fillRect((x * POINT_SIZE) + BORDER_SIZE,
+                        (y * POINT_SIZE) + BORDER_SIZE,
+                        POINT_SIZE - 2 * BORDER_SIZE,
+                        POINT_SIZE - 2 * BORDER_SIZE);
+                }
+            }
+        }
+    });
+
+    gameData.setData(0, 2, true);
+    gameData.setData(1, 2, true);
+
+    canvas.addEventListener('click', (ev) => {
+        const rect = canvas.getBoundingClientRect();
+        x = Math.trunc((ev.clientX - rect.left) / POINT_SIZE);
+        y = Math.trunc((ev.clientY - rect.top) / POINT_SIZE);
+        gameData.setData(x, y, !gameData.getData(x, y));
+    });
+
+    setInterval(() => {
+        const res = new Array(FIELD_SIZE).fill(false).map(el => new Array(FIELD_SIZE).fill(false));
+        for (let y = 0; y < FIELD_SIZE; y++) {
+            for (let x = 0; x < FIELD_SIZE; x++) {
+                if (!gameData.getData(x, y) && gameData.neighborsHave(x, y) === 3) {
+                    res[y][x] = true;
+                }
+                if (gameData.getData(x, y)) {
+                    if(gameData.neighborsHave(x, y) === 3 || gameData.neighborsHave(x, y) === 2) {
+                        res[y][x] = true;
+                    } else {
+                        res[y][x] = false;
+                    }
+                    
+                }
+            }
+        }
+
+        gameData.setAllData(res);
+    }, 2500);
+
+
+
+</script>
+
+</html>
