@@ -11,16 +11,17 @@
 </head>
 
 <body>
-    <canvas id="game" width="400px" height="400px"></canvas>
+    <canvas id="game"></canvas>
 </body>
 <script>
-    const FIELD_SIZE = 40;
+    const FIELD_SIZE = 30;
     const POINT_SIZE = 20;
     const BORDER_SIZE = 1;
 
     const canvas = document.querySelector('#game');
     const context = canvas.getContext('2d');
-
+    canvas.width = FIELD_SIZE * POINT_SIZE;
+    canvas.height = FIELD_SIZE * POINT_SIZE;
 
     class FieldData {
         constructor(filedSize) {
@@ -36,9 +37,8 @@
             this.dataChangeFunc(this.fieldData);
         }
 
-        setData(y, x, state) {
-
-            this.fieldData[x][y] = state;
+        setData(x, y, state) {
+            this.fieldData[this.normalizePosition(y)][this.normalizePosition(x)] = state;
             this.dataChangeFunc(this.fieldData);
         }
 
@@ -48,19 +48,13 @@
         }
 
         getData(x, y) {
-            if (x < 0) {
-                x = FIELD_SIZE - 1 + x;
-            }
-            if (y < 0) {
-                y = FIELD_SIZE - 1 + y;
-            }
-            if (x >= FIELD_SIZE) {
-                x = x - FIELD_SIZE;
-            }
-            if (y >= FIELD_SIZE) {
-                y = y - FIELD_SIZE;
-            }
-            return this.fieldData[y][x];
+            return this.fieldData[this.normalizePosition(y)][this.normalizePosition(x)];
+        }
+
+        normalizePosition(pos) {
+            if (pos < 0) return FIELD_SIZE + pos;
+            if (pos >= FIELD_SIZE) return pos - FIELD_SIZE;
+            return pos;
         }
 
         neighborsHave(x, y) {
@@ -120,7 +114,7 @@
                     } else {
                         res[y][x] = false;
                     }
-                    
+
                 }
             }
         }
