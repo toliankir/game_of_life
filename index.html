@@ -37,6 +37,7 @@
         }
 
         setData(y, x, state) {
+
             this.fieldData[x][y] = state;
             this.dataChangeFunc(this.fieldData);
         }
@@ -95,6 +96,9 @@
 
     gameData.setData(0, 2, true);
     gameData.setData(1, 2, true);
+    gameData.setData(2, 2, true);
+    gameData.setData(2, 3, true);
+    gameData.setData(1, 4, true);
 
     canvas.addEventListener('click', (ev) => {
         const rect = canvas.getBoundingClientRect();
@@ -122,7 +126,7 @@
         }
 
         gameData.setAllData(res);
-    }, 2500);
+    }, 500);
 
 
 
