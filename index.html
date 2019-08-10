@@ -71,11 +71,11 @@
         }
     }
 
-
-
     const gameData = new FieldData(5);
     gameData.onDataChange((data) => {
         context.clearRect(0, 0, canvas.width, canvas.height);
+        drawGrid();
+        context.fillStyle = 'black';
         for (let y = 0; y < FIELD_SIZE; y++) {
             for (let x = 0; x < FIELD_SIZE; x++) {
                 if (data[y][x]) {
@@ -109,7 +109,7 @@
                     res[y][x] = true;
                 }
                 if (gameData.getData(x, y)) {
-                    if(gameData.neighborsHave(x, y) === 3 || gameData.neighborsHave(x, y) === 2) {
+                    if (gameData.neighborsHave(x, y) === 3 || gameData.neighborsHave(x, y) === 2) {
                         res[y][x] = true;
                     } else {
                         res[y][x] = false;
@@ -118,11 +118,18 @@
                 }
             }
         }
-
         gameData.setAllData(res);
     }, 500);
 
-
+    function drawGrid() {
+        const lineLength = POINT_SIZE * FIELD_SIZE;
+        for (let i = 1; i < FIELD_SIZE; i++) {
+            const linePosition = (i * POINT_SIZE) - 1;
+            context.fillStyle = 'grey';
+            context.fillRect(linePosition, 0, 2, lineLength);
+            context.fillRect(0, linePosition, lineLength, 2);
+        }
+    }
 
 </script>
 
